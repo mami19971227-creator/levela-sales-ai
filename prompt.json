@@ -1,3 +1,657 @@
-{
-  "prompt": "ここにプロンプトを書きます"
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Levela Sales Reply AI</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700;900&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#FAFAF8;
+  --card:#FFFFFF;
+  --ink:#111111;
+  --muted:#747474;
+  --line:#ECE8DF;
+  --line2:#DCD6CA;
+  --gold:#C7B27C;
+  --gold-soft:#F3EBDD;
+  --danger:#A5281B;
 }
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  margin:0;
+  background:var(--bg);
+  color:var(--ink);
+  font-family:"Noto Sans JP",-apple-system,BlinkMacSystemFont,"Hiragino Sans","Yu Gothic",Meiryo,sans-serif;
+  letter-spacing:.01em;
+}
+button,input,textarea,select{font-family:inherit}
+button{cursor:pointer}
+.hide{display:none!important}
+
+/* Header */
+.header{
+  background:rgba(250,250,248,.92);
+  backdrop-filter:blur(14px);
+  border-bottom:1px solid var(--line);
+  position:sticky;
+  top:0;
+  z-index:20;
+}
+.headerInner{
+  max-width:1080px;
+  margin:0 auto;
+  padding:18px 24px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:20px;
+}
+.brand{display:flex;align-items:center;gap:14px}
+.logoImage{
+  display:block;
+  width:230px;
+  max-width:58vw;
+  height:auto;
+}
+.logoSub{font-size:10px;color:var(--muted);letter-spacing:.22em;margin-top:6px;text-transform:uppercase}
+.headerNav{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.mode{
+  border:1px solid var(--line);
+  background:#fff;
+  border-radius:999px;
+  padding:8px 14px;
+  font-size:12px;
+  font-weight:700;
+  color:#444;
+}
+.main{max-width:1080px;margin:0 auto;padding:32px 24px}
+
+/* Shared */
+.btn{
+  border:none;
+  border-radius:999px;
+  padding:12px 22px;
+  font-size:13px;
+  font-weight:800;
+  transition:.18s ease;
+}
+.btn:hover{transform:translateY(-1px)}
+.btnBlack{background:var(--ink);color:#fff}
+.btnBlack:hover{box-shadow:0 0 0 3px rgba(199,178,124,.25)}
+.btnWhite{background:#fff;color:var(--ink);border:1px solid var(--line)}
+.btnGold{background:var(--gold);color:#111}
+.btnDanger{background:#FFF4F2;color:var(--danger);border:1px solid #F0D1CB}
+.actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:20px}
+
+.card{
+  background:var(--card);
+  border:1px solid var(--line);
+  border-radius:22px;
+  padding:26px;
+}
+.card + .card{margin-top:18px}
+.title{
+  margin:0;
+  font-size:20px;
+  font-weight:900;
+  letter-spacing:.04em;
+}
+.desc{
+  margin:8px 0 0;
+  color:var(--muted);
+  font-size:13px;
+  line-height:1.8;
+}
+.divider{height:1px;background:var(--line);margin:24px 0}
+label{
+  display:block;
+  margin:18px 0 8px;
+  font-size:13px;
+  font-weight:800;
+}
+input,textarea,select{
+  width:100%;
+  border:1px solid var(--line2);
+  border-radius:14px;
+  background:#fff;
+  color:var(--ink);
+  padding:13px 14px;
+  font-size:14px;
+  line-height:1.7;
+  outline:none;
+  transition:.16s ease;
+}
+input:focus,textarea:focus,select:focus{
+  border-color:var(--gold);
+  box-shadow:0 0 0 4px rgba(199,178,124,.14);
+}
+textarea{min-height:150px;resize:vertical}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.status{font-size:12px;color:var(--muted);line-height:1.8;margin-top:12px}
+.danger{color:var(--danger);font-weight:800}
+
+/* Home */
+.home{
+  min-height:calc(100vh - 110px);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+.homeBox{
+  width:100%;
+  max-width:920px;
+  text-align:center;
+}
+.homeLabel{
+  color:var(--gold);
+  font-size:12px;
+  font-weight:900;
+  letter-spacing:.22em;
+  text-transform:uppercase;
+}
+.homeTitle{
+  margin:12px 0 10px;
+  font-size:42px;
+  font-weight:900;
+  letter-spacing:.07em;
+}
+.homeLead{
+  margin:0 auto 34px;
+  color:var(--muted);
+  font-size:14px;
+  line-height:2;
+}
+.roleGrid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:18px;
+  text-align:left;
+}
+.roleCard{
+  position:relative;
+  background:#fff;
+  border:1px solid var(--line);
+  border-radius:24px;
+  padding:30px;
+  min-height:214px;
+  text-align:left;
+  transition:.22s ease;
+}
+.roleCard:hover{
+  transform:translateY(-4px);
+  border-color:var(--gold);
+  box-shadow:0 18px 36px rgba(0,0,0,.06);
+}
+.roleIcon{
+  width:48px;height:48px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  margin-bottom:18px;
+  font-size:22px;
+}
+.roleIcon.black{background:#111;color:#fff}
+.roleIcon.gold{background:var(--gold-soft);color:#111;border:1px solid #E5D7B6}
+.roleCard h2{margin:0 0 10px;font-size:20px;font-weight:900;letter-spacing:.04em}
+.roleCard p{margin:0;color:var(--muted);font-size:13px;line-height:1.9}
+.roleArrow{position:absolute;right:26px;bottom:24px;color:var(--gold);font-weight:900;font-size:22px}
+
+/* Staff */
+.layout{
+  display:grid;
+  grid-template-columns:minmax(0,1fr) minmax(340px,.78fr);
+  gap:20px;
+  align-items:start;
+}
+.resultSmall{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:12px;
+}
+.metric{
+  border:1px solid var(--line);
+  border-radius:16px;
+  padding:14px;
+  background:#fff;
+}
+.metric b{
+  display:block;
+  color:var(--muted);
+  font-size:11px;
+  margin-bottom:6px;
+}
+.metric span{font-size:14px;font-weight:900}
+.box{
+  border:1px solid var(--line);
+  background:#FCFBF8;
+  border-radius:16px;
+  padding:15px;
+  min-height:126px;
+  white-space:pre-wrap;
+  font-size:14px;
+  line-height:1.8;
+}
+.replyBox{
+  border:1px solid var(--line);
+  background:#FCFBF8;
+  border-radius:18px;
+  padding:18px;
+  min-height:190px;
+  white-space:pre-wrap;
+  font-size:15px;
+  line-height:1.9;
+}
+.copyNote{
+  color:var(--muted);
+  font-size:12px;
+  line-height:1.8;
+  margin-top:12px;
+}
+
+/* Admin */
+.adminLayout{
+  display:grid;
+  grid-template-columns:.86fr 1.14fr;
+  gap:20px;
+  align-items:start;
+}
+.prompt{min-height:390px}
+.notice{
+  margin-top:14px;
+  background:#FCF8EF;
+  border:1px solid #EDE0C2;
+  border-radius:16px;
+  padding:13px 14px;
+  color:#6B5A2B;
+  font-size:12px;
+  line-height:1.8;
+}
+
+@media(max-width:860px){
+  .headerInner{align-items:flex-start;flex-direction:column;padding:16px}
+  .main{padding:22px 16px}
+  .homeTitle{font-size:30px}
+  .roleGrid,.layout,.adminLayout,.row,.resultSmall{grid-template-columns:1fr}
+  .card{padding:20px}
+}
+</style>
+</head>
+<body>
+<header class="header">
+  <div class="headerInner">
+    <div class="brand">
+      <div>
+        <img class="logoImage" src="data:image/png;base64,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" alt="株式会社Levela">
+        <div class="logoSub">Internal Sales Tool</div>
+      </div>
+    </div>
+    <div class="headerNav">
+      <span id="modeBadge" class="mode">役割選択</span>
+      <button class="btn btnWhite" onclick="showHome()">ホーム</button>
+    </div>
+  </div>
+</header>
+
+<main class="main">
+  <section id="homeArea" class="home">
+    <div class="homeBox">
+      <div class="homeLabel">Sales Reply AI</div>
+      <h1 class="homeTitle">社内営業返信ツール</h1>
+      <p class="homeLead">
+        Levela社内向けの返信作成ツールです。<br>
+        使用する役割を選択してください。
+      </p>
+
+      <div class="roleGrid">
+        <button class="roleCard" onclick="toStaff()">
+          <div class="roleIcon black">👤</div>
+          <h2>営業担当者</h2>
+          <p>お客様名、LINE内容、営業担当に伝えたいことを入力して返信文を作成します。</p>
+          <div class="roleArrow">→</div>
+        </button>
+
+        <button class="roleCard" onclick="adminLogin()">
+          <div class="roleIcon gold">⚙️</div>
+          <h2>管理者</h2>
+          <p>APIキー、管理者パスワード、AIへの指示文を設定します。</p>
+          <div class="roleArrow">→</div>
+        </button>
+      </div>
+    </div>
+  </section>
+
+  <section id="staffArea" class="hide">
+    <div class="layout">
+      <div class="card">
+        <h2 class="title">返信作成</h2>
+        <p class="desc">営業担当者用画面です。APIキーや管理設定は表示されません。</p>
+
+        <div class="divider"></div>
+
+        <div class="row">
+          <div>
+            <label>お客様の名前</label>
+            <input id="name" placeholder="例：田中">
+          </div>
+          <div>
+            <label>対応パターン</label>
+            <select id="pattern">
+              <option>自動判定</option>
+              <option>辞退</option>
+              <option>日程変更</option>
+              <option>質問あり</option>
+              <option>感想＋質問</option>
+              <option>不安あり</option>
+              <option>他社比較中</option>
+              <option>ジャンル迷子</option>
+              <option>副業・収入目的型</option>
+              <option>Instagram運用中</option>
+              <option>現状共有</option>
+              <option>宿題・行動報告</option>
+              <option>面談前向き</option>
+              <option>感想・満足型</option>
+            </select>
+          </div>
+        </div>
+
+        <label>お客様からのLINEメッセージ</label>
+        <textarea id="line" placeholder="お客様のLINEをそのまま貼り付け"></textarea>
+
+        <label>営業担当に伝えたいこと・事前アンケート回答</label>
+        <textarea id="survey" placeholder="お客様が事前に記入してくれた内容をそのまま貼り付け"></textarea>
+
+        <div class="actions">
+          <button class="btn btnBlack" onclick="generateAI()">返信を作成</button>
+          <button class="btn btnWhite" onclick="clearAll()">クリア</button>
+        </div>
+        <div id="status" class="status"></div>
+      </div>
+
+      <div>
+        <div class="card">
+          <h2 class="title">AIサマリー</h2>
+          <p class="desc">返信前に確認すべきポイントです。</p>
+
+          <div class="divider"></div>
+
+          <div class="resultSmall">
+            <div class="metric">
+              <b>お客様タイプ</b>
+              <span id="patternOut">-</span>
+            </div>
+            <div class="metric">
+              <b>温度感</b>
+              <span id="tempOut">-</span>
+            </div>
+          </div>
+
+          <label>営業担当への注意点</label>
+          <div id="warningOut" class="box">ここに注意点が表示されます。</div>
+        </div>
+
+        <div class="card">
+          <h2 class="title">返信文</h2>
+          <p class="desc">コピーしてLINEに貼り付けてください。</p>
+
+          <div class="divider"></div>
+
+          <div id="reply" class="replyBox">ここに返信文が表示されます。</div>
+          <div class="actions">
+            <button class="btn btnBlack" onclick="copyReply()">返信文をコピー</button>
+          </div>
+          <div class="copyNote">送信前に、お客様が書いていないことが入っていないか必ず確認してください。</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="adminArea" class="hide">
+    <div class="adminLayout">
+      <div class="card">
+        <h2 class="title">管理者設定</h2>
+        <p class="desc">営業担当者には表示されない設定項目です。</p>
+
+        <div class="divider"></div>
+
+        <label>OpenAI API Key</label>
+        <input id="apiKey" type="password" placeholder="sk-...">
+
+        <div class="actions">
+          <button class="btn btnBlack" onclick="saveKey()">APIキーを保存</button>
+          <button class="btn btnDanger" onclick="clearKey()">削除</button>
+        </div>
+
+        <label>管理者パスワード</label>
+        <input id="adminPass" type="password" placeholder="管理者画面に入るためのパスワード">
+
+        <div class="actions">
+          <button class="btn btnWhite" onclick="savePass()">パスワードを保存</button>
+        </div>
+
+        <div class="notice">
+          初回はパスワード未設定でも管理者画面に入れます。<br>
+          社内共有前に必ず管理者パスワードを設定してください。
+        </div>
+
+        <div id="adminStatus" class="status"></div>
+      </div>
+
+      <div class="card">
+        <h2 class="title">AIへの指示文</h2>
+        <p class="desc">ここにはGitHubのprompt.jsonから読み込んだ内容が表示されます。変更はGitHubで行ってください。</p>
+
+        <div class="divider"></div>
+
+        <label>プロンプト</label>
+        <textarea id="promptBox" class="prompt"></textarea>
+
+        <div class="actions">
+          <button class="btn btnBlack" onclick="savePrompt()">変更方法を確認</button>
+          <button class="btn btnWhite" onclick="resetPrompt()">再読み込み</button>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<script>
+const $ = id => document.getElementById(id);
+
+const DEFAULT_PROMPT = `あなたはInstagramスクールの営業管理AIです。
+目的は契約ではなく、個別面談の着座率を最大化する返信を作ることです。
+
+【最重要ルール】
+・お客様が書いていないことは絶対に書かない。
+・LINEメッセージ、営業担当に伝えたいことに書かれている内容のみ扱う。
+・子ども、仕事、体調、家族、金銭状況、経験などは明記がある場合のみ触れる。
+・営業感、煽り、断定、憶測は禁止。
+・質問がある場合は必ず触れる。ただし金額は返信で伝えず、面談で詳しく説明する形にする。
+・返信は100〜220文字程度。LINEで読みやすく改行する。
+・名前がある場合は「名前さん」。名前がない場合は「⚪︎⚪︎さん」。
+
+【パターン候補】
+辞退 / 日程変更 / 質問あり / 感想＋質問 / 不安あり / 他社比較中 / ジャンル迷子 / 副業・収入目的型 / Instagram運用中 / 現状共有 / 宿題・行動報告 / 面談前向き / 感想・満足型 / その他
+
+【返信の流れ】
+共感 → 承認 → 安心 → 個別面談だからできること → 前向きに締める
+
+【出力形式】
+JSONのみ。
+{
+ "patterns":["該当パターン"],
+ "temperature":"温度感を100点満点で",
+ "priority":"返信で最優先すべきこと",
+ "warning":"営業担当への注意点",
+ "reply":"LINEでそのまま送れる返信文"
+}`;
+let ACTIVE_PROMPT = DEFAULT_PROMPT;
+
+async function loadPromptFromJson(){
+  try{
+    const res = await fetch("prompt.json?ts=" + Date.now(), { cache:"no-store" });
+    if(!res.ok) throw new Error("prompt.jsonが見つかりません");
+    const data = await res.json();
+    const prompt = data.systemPrompt || data.prompt || data.content || "";
+    if(!prompt.trim()) throw new Error("prompt.jsonのsystemPromptが空です");
+    ACTIVE_PROMPT = prompt;
+    if($("promptBox")) $("promptBox").value = ACTIVE_PROMPT;
+    console.log("prompt.jsonを読み込みました");
+  }catch(e){
+    ACTIVE_PROMPT = DEFAULT_PROMPT;
+    if($("promptBox")) $("promptBox").value = DEFAULT_PROMPT;
+    console.warn("prompt.jsonを読み込めなかったため、初期プロンプトで動作します：", e.message);
+  }
+}
+
+$("apiKey").value = localStorage.getItem("openai_api_key") || "";
+$("adminPass").value = localStorage.getItem("admin_pass") || "";
+$("promptBox").value = "prompt.jsonを読み込み中です...";
+$("promptBox").readOnly = true;
+loadPromptFromJson();
+
+function hideAll(){
+  ["homeArea","staffArea","adminArea"].forEach(id => $(id).classList.add("hide"));
+}
+function showHome(){
+  hideAll();
+  $("homeArea").classList.remove("hide");
+  $("modeBadge").textContent = "役割選択";
+}
+function toStaff(){
+  hideAll();
+  $("staffArea").classList.remove("hide");
+  $("modeBadge").textContent = "営業担当者";
+}
+function adminLogin(){
+  const saved = localStorage.getItem("admin_pass");
+  if(saved){
+    const p = prompt("管理者パスワードを入力してください");
+    if(p !== saved){
+      alert("パスワードが違います");
+      return;
+    }
+  }
+  hideAll();
+  $("adminArea").classList.remove("hide");
+  $("modeBadge").textContent = "管理者";
+  loadPromptFromJson();
+}
+
+function escapeHtml(s){
+  return String(s).replace(/[&<>"']/g, m => ({
+    "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
+  }[m]));
+}
+function staffMsg(text, isDanger=false){
+  $("status").innerHTML = isDanger ? '<span class="danger">'+escapeHtml(text)+'</span>' : escapeHtml(text);
+}
+function adminMsg(text){
+  $("adminStatus").textContent = text;
+}
+
+function saveKey(){
+  localStorage.setItem("openai_api_key", $("apiKey").value.trim());
+  adminMsg("APIキーを保存しました。");
+}
+function clearKey(){
+  localStorage.removeItem("openai_api_key");
+  $("apiKey").value = "";
+  adminMsg("APIキーを削除しました。");
+}
+function savePass(){
+  localStorage.setItem("admin_pass", $("adminPass").value);
+  adminMsg("管理者パスワードを保存しました。");
+}
+function savePrompt(){
+  adminMsg("プロンプトはGitHubのprompt.jsonを編集してください。この画面からは変更できません。");
+}
+function resetPrompt(){
+  loadPromptFromJson();
+  adminMsg("prompt.jsonを再読み込みしました。");
+}
+function setResult(pattern, temp, warning, reply){
+  $("patternOut").textContent = pattern || "-";
+  $("tempOut").textContent = temp || "-";
+  $("warningOut").textContent = warning || "ここに注意点が表示されます。";
+  $("reply").textContent = reply || "ここに返信文が表示されます。";
+}
+
+async function generateAI(){
+  await loadPromptFromJson();
+
+  const name = $("name").value.trim();
+  const pattern = $("pattern").value;
+  const line = $("line").value.trim();
+  const survey = $("survey").value.trim();
+
+  if(!line && !survey){
+    staffMsg("LINE内容か営業担当に伝えたいことを入力してください。", true);
+    return;
+  }
+
+  const key = localStorage.getItem("openai_api_key");
+  if(!key){
+    staffMsg("APIキーが未設定です。管理者に設定を依頼してください。", true);
+    return;
+  }
+
+  staffMsg("AI生成中です...");
+  setResult("生成中...", "生成中...", "生成中...", "生成中...");
+
+  try{
+    const res = await fetch("https://api.openai.com/v1/responses", {
+      method:"POST",
+      headers:{
+        "Content-Type":"application/json",
+        "Authorization":"Bearer " + key
+      },
+      body:JSON.stringify({
+        model:"gpt-4.1-mini",
+        input:[
+          {role:"system", content:ACTIVE_PROMPT},
+          {role:"user", content:`【お客様名】${name || "未入力"}
+【対応パターン】${pattern}
+【LINEメッセージ】${line || "なし"}
+【営業担当に伝えたいこと】${survey || "なし"}`}
+        ],
+        temperature:0.4
+      })
+    });
+
+    const json = await res.json();
+    if(!res.ok) throw new Error(json.error?.message || "APIエラー");
+
+    const clean = (json.output_text || "").replace(/```json|```/g,"").trim();
+    const parsed = JSON.parse(clean.slice(clean.indexOf("{"), clean.lastIndexOf("}") + 1));
+
+    setResult(
+      (parsed.patterns || []).join(" / "),
+      parsed.temperature || "",
+      parsed.warning || "",
+      parsed.reply || ""
+    );
+    staffMsg("完了しました。");
+  }catch(e){
+    staffMsg("エラー：" + e.message, true);
+    setResult("-", "-", "エラーが出ました。管理者に確認してください。", "");
+  }
+}
+
+async function copyReply(){
+  try{
+    await navigator.clipboard.writeText($("reply").textContent);
+    staffMsg("返信文をコピーしました。");
+  }catch(e){
+    staffMsg("コピーできない場合は返信文を選択してコピーしてください。", true);
+  }
+}
+function clearAll(){
+  ["name","line","survey"].forEach(id => $(id).value = "");
+  setResult("-", "-", "ここに注意点が表示されます。", "ここに返信文が表示されます。");
+  staffMsg("入力をクリアしました。");
+}
+</script>
+</body>
+</html>
