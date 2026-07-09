@@ -440,7 +440,7 @@ textarea{min-height:150px;resize:vertical}
 
       <div class="card">
         <h2 class="title">AIへの指示文</h2>
-        <p class="desc">返信ルールを変更したい場合のみ編集してください。</p>
+        <p class="desc">ここにはGitHubのprompt.jsonから読み込んだ内容が表示されます。変更はGitHubで行ってください。</p>
 
         <div class="divider"></div>
 
@@ -448,8 +448,8 @@ textarea{min-height:150px;resize:vertical}
         <textarea id="promptBox" class="prompt"></textarea>
 
         <div class="actions">
-          <button class="btn btnBlack" onclick="savePrompt()">保存</button>
-          <button class="btn btnWhite" onclick="resetPrompt()">初期に戻す</button>
+          <button class="btn btnBlack" onclick="savePrompt()">変更方法を確認</button>
+          <button class="btn btnWhite" onclick="resetPrompt()">再読み込み</button>
         </div>
       </div>
     </div>
@@ -486,10 +486,30 @@ JSONのみ。
  "warning":"営業担当への注意点",
  "reply":"LINEでそのまま送れる返信文"
 }`;
+let ACTIVE_PROMPT = DEFAULT_PROMPT;
+
+async function loadPromptFromJson(){
+  try{
+    const res = await fetch("prompt.json?ts=" + Date.now(), { cache:"no-store" });
+    if(!res.ok) throw new Error("prompt.jsonが見つかりません");
+    const data = await res.json();
+    const prompt = data.systemPrompt || data.prompt || data.content || "";
+    if(!prompt.trim()) throw new Error("prompt.jsonのsystemPromptが空です");
+    ACTIVE_PROMPT = prompt;
+    if($("promptBox")) $("promptBox").value = ACTIVE_PROMPT;
+    console.log("prompt.jsonを読み込みました");
+  }catch(e){
+    ACTIVE_PROMPT = DEFAULT_PROMPT;
+    if($("promptBox")) $("promptBox").value = DEFAULT_PROMPT;
+    console.warn("prompt.jsonを読み込めなかったため、初期プロンプトで動作します：", e.message);
+  }
+}
 
 $("apiKey").value = localStorage.getItem("openai_api_key") || "";
 $("adminPass").value = localStorage.getItem("admin_pass") || "";
-$("promptBox").value = localStorage.getItem("ai_prompt") || DEFAULT_PROMPT;
+$("promptBox").value = "prompt.jsonを読み込み中です...";
+$("promptBox").readOnly = true;
+loadPromptFromJson();
 
 function hideAll(){
   ["homeArea","staffArea","adminArea"].forEach(id => $(id).classList.add("hide"));
@@ -516,6 +536,7 @@ function adminLogin(){
   hideAll();
   $("adminArea").classList.remove("hide");
   $("modeBadge").textContent = "管理者";
+  loadPromptFromJson();
 }
 
 function escapeHtml(s){
@@ -544,13 +565,11 @@ function savePass(){
   adminMsg("管理者パスワードを保存しました。");
 }
 function savePrompt(){
-  localStorage.setItem("ai_prompt", $("promptBox").value);
-  adminMsg("プロンプトを保存しました。");
+  adminMsg("プロンプトはGitHubのprompt.jsonを編集してください。この画面からは変更できません。");
 }
 function resetPrompt(){
-  $("promptBox").value = DEFAULT_PROMPT;
-  localStorage.setItem("ai_prompt", DEFAULT_PROMPT);
-  adminMsg("初期プロンプトに戻しました。");
+  loadPromptFromJson();
+  adminMsg("prompt.jsonを再読み込みしました。");
 }
 function setResult(pattern, temp, warning, reply){
   $("patternOut").textContent = pattern || "-";
@@ -560,6 +579,8 @@ function setResult(pattern, temp, warning, reply){
 }
 
 async function generateAI(){
+  await loadPromptFromJson();
+
   const name = $("name").value.trim();
   const pattern = $("pattern").value;
   const line = $("line").value.trim();
@@ -589,8 +610,11 @@ async function generateAI(){
       body:JSON.stringify({
         model:"gpt-4.1-mini",
         input:[
-          {role:"system", content:localStorage.getItem("ai_prompt") || DEFAULT_PROMPT},
-          {role:"user", content:`【お客様名】${name || "未入力"}\n【対応パターン】${pattern}\n【LINEメッセージ】${line || "なし"}\n【営業担当に伝えたいこと】${survey || "なし"}`}
+          {role:"system", content:ACTIVE_PROMPT},
+          {role:"user", content:`【お客様名】${name || "未入力"}
+【対応パターン】${pattern}
+【LINEメッセージ】${line || "なし"}
+【営業担当に伝えたいこと】${survey || "なし"}`}
         ],
         temperature:0.4
       })
